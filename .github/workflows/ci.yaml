@@ -1,0 +1,72 @@
+name: 'CI'
+
+on:
+  push:
+    branches: [ '*' ]
+    paths-ignore:
+      - '.github/dependabot.yaml'
+  pull_request:
+    types: [ opened, edited, reopened, synchronize, review_requested ]
+    branches: [ '*' ]
+  workflow_call:
+
+  # Allow manually trigger
+  workflow_dispatch:
+
+env:
+  TAG_PREFIX: v
+
+jobs:
+  Build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build project
+        run: |
+          echo "Building project..."
+
+  Lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lint code
+        run: |
+          echo "Linting code..."
+
+  Test:
+    name: Test
+    needs: [Build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run tests
+        run: |
+          echo "Running tests..."
+
+  ReleaseDryRun:
+    if: github.event_name == 'push'
+    needs: [Lint, Test]
+    runs-on: ubuntu-latest
+    outputs:
+      RESULT: ${{ steps.release_dry_run.outputs.result }}
+      VERSION: ${{ steps.release_dry_run.outputs.releaseVersion }}
+      RELEASE_NOTES: ${{ steps.release_dry_run.outputs.releaseNotes }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+      - name: Install Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 'lts/*'
+      - name: Release (dry-run)
+        # see https://github.com/btnguyen2k/action-semrelease for documentation
+        id: release_dry_run
+        uses: btnguyen2k/action-semrelease@v4
+        with:
+          dry-run: true
+          auto-mode: true
+          github-token: ${{ github.token }}
+          tag-major-release: false
+          tag-minor-release: false
+          branches: ${{ github.ref_name }}
+          tag-prefix: ${{ env.TAG_PREFIX }}
+          tag-only: true
