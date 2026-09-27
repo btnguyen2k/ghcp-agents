@@ -1,6 +1,8 @@
 ---
 name: angular-style-commit-message-generator
 description: Generate concise, meaning-first Angular-style commit messages from repository changes. Write messages to a file only when the user explicitly asks.
+metadata:
+  version: "0.1.0"
 ---
 
 # Angular-style commit message generator

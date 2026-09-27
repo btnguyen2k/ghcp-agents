@@ -23,9 +23,9 @@ workflow. A well-scoped agent can help:
 
 ## Available agents
 
-| Agent | Description |
-| --- | --- |
-| [Angular-style commit message generator](agents/angular-style-commit-message-generator.agent.md) | Generates concise, meaning-first Angular-style commit messages from selected or staged changes. Supports independent outcomes and opt-in file persistence. |
+| Agent | Version | Description |
+| --- | --- | --- |
+| [Angular-style commit message generator](agents/angular-style-commit-message-generator.agent.md) | 0.1.0 | Generates concise, meaning-first Angular-style commit messages from selected or staged changes. Supports independent outcomes and opt-in file persistence. |
 
 Example requests:
 
