@@ -26,13 +26,30 @@ workflow. A well-scoped agent can help:
 | Agent | Version | Description |
 | --- | --- | --- |
 | [Angular-style commit message generator](agents/angular-style-commit-message-generator.agent.md) | 0.1.0 | Generates concise, meaning-first Angular-style commit messages from selected or staged changes. Supports independent outcomes and opt-in file persistence. |
+| [Generic code reviewer](agents/generic-code-reviewer.agent.md) | 0.1.0 | Reviews supplied changes or repository scopes for high-confidence correctness, regression, compatibility, reliability, and performance defects with coverage disclosure. |
+| [Generic security reviewer](agents/generic-security-reviewer.agent.md) | 0.1.0 | Audits supplied changes or repository scopes for high-confidence exploitable vulnerabilities with evidence, coverage disclosure, severity, and remediation guidance. |
 
 Example requests:
 
-- Generate a commit message for the staged changes.
-- Generate separate commit messages for each independent change.
-- Generate the commit messages and append them to
+- **`angular-style-commit-message-generator`:** Generate a commit message for
+  the staged changes.
+- **`angular-style-commit-message-generator`:** Generate separate commit
+  messages for each independent change.
+- **`angular-style-commit-message-generator`:** Generate the commit messages
+  and append them to
   `.semrelease/this_release`.
+- **`generic-code-reviewer`:** Review the attached changes since the last
+  commit for high-confidence code defects.
+- **`generic-code-reviewer`:** Audit the whole repository for high-confidence
+  code defects and report examined areas and coverage limitations.
+- **`generic-security-reviewer`:** Review the attached changes since the last
+  push for exploitable security vulnerabilities.
+- **`generic-security-reviewer`:** Audit the whole repository for exploitable
+  security vulnerabilities and report examined areas and coverage limitations.
+
+The reviewer agents intentionally expose only read and search tools. Supply the
+change context for change reviews. Whole-repository audits must be requested
+explicitly and report their coverage limitations.
 
 See [ROADMAP.md](ROADMAP.md) for planned agent categories and future work.
 
@@ -68,10 +85,12 @@ Open the repository in a GitHub Copilot client that supports custom agents and
 select the installed agent. In GitHub Copilot CLI, run `/agent` to browse and
 select available agents.
 
-To select this repository's first agent directly:
+To select an agent directly:
 
 ```text
 /agent angular-style-commit-message-generator
+/agent generic-code-reviewer
+/agent generic-security-reviewer
 ```
 
 See GitHub's
@@ -108,9 +127,11 @@ Contributions are welcome. To propose a new agent or improve an existing one:
 
 1. Fork the repository and create a focused branch.
 2. Add or update an agent profile under `agents/`.
-3. Test the profile against a representative development task.
-4. Update the agent catalog in this README when applicable.
-5. Open a pull request describing the use case and expected behavior.
+3. Do not copy it into this repository's `.github/agents/` directory unless
+   repository maintainers explicitly request local enablement.
+4. Test the profile against a representative development task.
+5. Update the agent catalog in this README when applicable.
+6. Open a pull request describing the use case and expected behavior.
 
 Please keep each pull request focused on one agent or one closely related
 improvement. By contributing, you agree that your contribution will be
