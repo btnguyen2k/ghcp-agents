@@ -7,6 +7,8 @@
 - [Generic security reviewer](agents/generic-security-reviewer.agent.md)
 - [C# code reviewer](agents/csharp-code-reviewer.agent.md)
 - [C# security reviewer](agents/csharp-security-reviewer.agent.md)
+- [Python code reviewer](agents/python-code-reviewer.agent.md)
+- [Python security reviewer](agents/python-security-reviewer.agent.md)
 
 ## Future agent categories
 

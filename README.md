@@ -30,6 +30,8 @@ workflow. A well-scoped agent can help:
 | [Generic security reviewer](agents/generic-security-reviewer.agent.md) | 0.1.0 | Audits supplied changes or repository scopes for high-confidence exploitable vulnerabilities with evidence, coverage disclosure, severity, and remediation guidance. |
 | [C# code reviewer](agents/csharp-code-reviewer.agent.md) | 0.1.0 | Reviews C# and .NET changes or repository scopes for high-confidence correctness, compatibility, reliability, and performance defects across ASP.NET Core, EF Core, Blazor, and runtime code. |
 | [C# security reviewer](agents/csharp-security-reviewer.agent.md) | 0.1.0 | Audits C# and .NET changes or repository scopes for high-confidence exploitable vulnerabilities across ASP.NET Core, EF Core, Blazor, and runtime boundaries. |
+| [Python code reviewer](agents/python-code-reviewer.agent.md) | 0.1.0 | Reviews Python changes or repository scopes for high-confidence correctness, compatibility, reliability, and performance defects across Django, Flask, FastAPI, SQLAlchemy, Pydantic, packaging, and runtime behavior. |
+| [Python security reviewer](agents/python-security-reviewer.agent.md) | 0.1.0 | Audits Python changes or repository scopes for high-confidence exploitable vulnerabilities across Django, Flask, FastAPI, SQLAlchemy, Pydantic, packaging, and runtime boundaries. |
 
 Example requests:
 
@@ -52,9 +54,13 @@ Example requests:
   high-confidence ASP.NET Core, EF Core, Blazor, and runtime defects.
 - **`csharp-security-reviewer`:** Audit the attached C# and .NET changes for
   exploitable ASP.NET Core, EF Core, Blazor, and runtime vulnerabilities.
+- **`python-code-reviewer`:** Review the attached Python changes for
+  high-confidence framework, ORM, packaging, and runtime defects.
+- **`python-security-reviewer`:** Audit the attached Python changes for
+  exploitable framework, ORM, packaging, and runtime vulnerabilities.
 
-The reviewer agents intentionally expose only read and search tools. Use the C#
-reviewers for C# and .NET scopes, including ASP.NET Core, EF Core, and Blazor,
+The reviewer agents intentionally expose only read and search tools. Use the
+C# reviewers for C# and .NET scopes, the Python reviewers for Python scopes,
 and the generic reviewers for other or mixed ecosystems. Supply the change
 context for change reviews. Whole-repository audits must be requested
 explicitly and report their coverage limitations.
@@ -101,6 +107,8 @@ To select an agent directly:
 /agent generic-security-reviewer
 /agent csharp-code-reviewer
 /agent csharp-security-reviewer
+/agent python-code-reviewer
+/agent python-security-reviewer
 ```
 
 See GitHub's
