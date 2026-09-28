@@ -5,13 +5,15 @@
 - [Angular-style commit message generator](agents/angular-style-commit-message-generator.agent.md)
 - [Generic code reviewer](agents/generic-code-reviewer.agent.md)
 - [Generic security reviewer](agents/generic-security-reviewer.agent.md)
+- [C# code reviewer](agents/csharp-code-reviewer.agent.md)
+- [C# security reviewer](agents/csharp-security-reviewer.agent.md)
 
 ## Future agent categories
 
 - Planning and software architecture
 - Code implementation and refactoring
 - Testing and debugging
-- Language- and framework-specific code and security review
+- Additional language- and framework-specific code and security review
 - Documentation and release preparation
 - CI/CD, dependency management, and repository maintenance
 

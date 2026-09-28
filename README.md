@@ -28,6 +28,8 @@ workflow. A well-scoped agent can help:
 | [Angular-style commit message generator](agents/angular-style-commit-message-generator.agent.md) | 0.1.0 | Generates concise, meaning-first Angular-style commit messages from selected or staged changes. Supports independent outcomes and opt-in file persistence. |
 | [Generic code reviewer](agents/generic-code-reviewer.agent.md) | 0.1.0 | Reviews supplied changes or repository scopes for high-confidence correctness, regression, compatibility, reliability, and performance defects with coverage disclosure. |
 | [Generic security reviewer](agents/generic-security-reviewer.agent.md) | 0.1.0 | Audits supplied changes or repository scopes for high-confidence exploitable vulnerabilities with evidence, coverage disclosure, severity, and remediation guidance. |
+| [C# code reviewer](agents/csharp-code-reviewer.agent.md) | 0.1.0 | Reviews C# and .NET changes or repository scopes for high-confidence correctness, compatibility, reliability, and performance defects across ASP.NET Core, EF Core, Blazor, and runtime code. |
+| [C# security reviewer](agents/csharp-security-reviewer.agent.md) | 0.1.0 | Audits C# and .NET changes or repository scopes for high-confidence exploitable vulnerabilities across ASP.NET Core, EF Core, Blazor, and runtime boundaries. |
 
 Example requests:
 
@@ -46,9 +48,15 @@ Example requests:
   push for exploitable security vulnerabilities.
 - **`generic-security-reviewer`:** Audit the whole repository for exploitable
   security vulnerabilities and report examined areas and coverage limitations.
+- **`csharp-code-reviewer`:** Review the attached C# and .NET changes for
+  high-confidence ASP.NET Core, EF Core, Blazor, and runtime defects.
+- **`csharp-security-reviewer`:** Audit the attached C# and .NET changes for
+  exploitable ASP.NET Core, EF Core, Blazor, and runtime vulnerabilities.
 
-The reviewer agents intentionally expose only read and search tools. Supply the
-change context for change reviews. Whole-repository audits must be requested
+The reviewer agents intentionally expose only read and search tools. Use the C#
+reviewers for C# and .NET scopes, including ASP.NET Core, EF Core, and Blazor,
+and the generic reviewers for other or mixed ecosystems. Supply the change
+context for change reviews. Whole-repository audits must be requested
 explicitly and report their coverage limitations.
 
 See [ROADMAP.md](ROADMAP.md) for planned agent categories and future work.
@@ -91,6 +99,8 @@ To select an agent directly:
 /agent angular-style-commit-message-generator
 /agent generic-code-reviewer
 /agent generic-security-reviewer
+/agent csharp-code-reviewer
+/agent csharp-security-reviewer
 ```
 
 See GitHub's
