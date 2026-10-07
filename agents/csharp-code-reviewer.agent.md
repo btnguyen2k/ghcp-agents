@@ -4,6 +4,8 @@ description: Review supplied C# and .NET changes or repository scopes for high-c
 tools: ["read", "search"]
 metadata:
   version: "0.1.0"
+  author: "btnguyen2k"
+  repository: "https://github.com/btnguyen2k/ghcp-agents"
 ---
 
 # C# code reviewer

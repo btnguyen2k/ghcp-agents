@@ -4,6 +4,8 @@ description: Audit supplied Python changes or repository scopes for high-confide
 tools: ["read", "search"]
 metadata:
   version: "0.1.0"
+  author: "btnguyen2k"
+  repository: "https://github.com/btnguyen2k/ghcp-agents"
 ---
 
 # Python security reviewer

@@ -3,6 +3,8 @@ name: angular-style-commit-message-generator
 description: Generate concise, meaning-first Angular-style commit messages from repository changes. Write messages to a file only when the user explicitly asks.
 metadata:
   version: "0.1.0"
+  author: "btnguyen2k"
+  repository: "https://github.com/btnguyen2k/ghcp-agents"
 ---
 
 # Angular-style commit message generator
