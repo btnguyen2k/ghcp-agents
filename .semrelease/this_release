@@ -3,3 +3,6 @@
 #   git log origin..HEAD | grep "^\s" > .semrelease/this_release
 #!VERSION=0.3.1
 - patch(agents/angular-style-commit-message-generator): secure repository inspection and opt-in file writes
+- patch(agents/generic-code-reviewer): redact sensitive values in review output
+- patch(agents/csharp-code-reviewer): redact sensitive values in review output
+- patch(agents/python-code-reviewer): redact sensitive values in review output
