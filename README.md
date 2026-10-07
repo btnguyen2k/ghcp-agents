@@ -25,12 +25,12 @@ workflow. A well-scoped agent can help:
 
 | Agent | Version | Description |
 | --- | --- | --- |
-| [Angular-style commit message generator](agents/angular-style-commit-message-generator.agent.md) | 0.1.0 | Generates concise, meaning-first Angular-style commit messages from selected or staged changes. Supports independent outcomes and opt-in file persistence. |
-| [Generic code reviewer](agents/generic-code-reviewer.agent.md) | 0.1.0 | Reviews supplied changes or repository scopes for high-confidence correctness, regression, compatibility, reliability, and performance defects with coverage disclosure. |
+| [Angular-style commit message generator](agents/angular-style-commit-message-generator.agent.md) | 0.1.1 | Generates concise, meaning-first Angular-style commit messages from selected or staged changes. Supports independent outcomes and opt-in file persistence. |
+| [Generic code reviewer](agents/generic-code-reviewer.agent.md) | 0.1.1 | Reviews supplied changes or repository scopes for high-confidence correctness, regression, compatibility, reliability, and performance defects with coverage disclosure. |
 | [Generic security reviewer](agents/generic-security-reviewer.agent.md) | 0.1.0 | Audits supplied changes or repository scopes for high-confidence exploitable vulnerabilities with evidence, coverage disclosure, severity, and remediation guidance. |
-| [C# code reviewer](agents/csharp-code-reviewer.agent.md) | 0.1.0 | Reviews C# and .NET changes or repository scopes for high-confidence correctness, compatibility, reliability, and performance defects across ASP.NET Core, EF Core, Blazor, and runtime code. |
+| [C# code reviewer](agents/csharp-code-reviewer.agent.md) | 0.1.1 | Reviews C# and .NET changes or repository scopes for high-confidence correctness, compatibility, reliability, and performance defects across ASP.NET Core, EF Core, Blazor, and runtime code. |
 | [C# security reviewer](agents/csharp-security-reviewer.agent.md) | 0.1.0 | Audits C# and .NET changes or repository scopes for high-confidence exploitable vulnerabilities across ASP.NET Core, EF Core, Blazor, and runtime boundaries. |
-| [Python code reviewer](agents/python-code-reviewer.agent.md) | 0.1.0 | Reviews Python changes or repository scopes for high-confidence correctness, compatibility, reliability, and performance defects across Django, Flask, FastAPI, SQLAlchemy, Pydantic, packaging, and runtime behavior. |
+| [Python code reviewer](agents/python-code-reviewer.agent.md) | 0.1.1 | Reviews Python changes or repository scopes for high-confidence correctness, compatibility, reliability, and performance defects across Django, Flask, FastAPI, SQLAlchemy, Pydantic, packaging, and runtime behavior. |
 | [Python security reviewer](agents/python-security-reviewer.agent.md) | 0.1.0 | Audits Python changes or repository scopes for high-confidence exploitable vulnerabilities across Django, Flask, FastAPI, SQLAlchemy, Pydantic, packaging, and runtime boundaries. |
 
 Example requests:
