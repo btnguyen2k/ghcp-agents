@@ -1,8 +1,3 @@
-# This file has been cleaned up post-releasing version 0.3.0.
+# This file has been cleaned up post-releasing version 0.3.1.
 # Generate its content quickly using the following command:
 #   git log origin..HEAD | grep "^\s" > .semrelease/this_release
-#!VERSION=0.3.1
-- patch(agents/angular-style-commit-message-generator): secure repository inspection and opt-in file writes
-- patch(agents/generic-code-reviewer): redact sensitive values in review output
-- patch(agents/csharp-code-reviewer): redact sensitive values in review output
-- patch(agents/python-code-reviewer): redact sensitive values in review output
