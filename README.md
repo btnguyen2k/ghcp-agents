@@ -127,13 +127,19 @@ Agents contributed to this repository should:
 - State important boundaries, expected outputs, and validation steps.
 - Avoid secrets and assumptions that only apply to one private environment.
 - Be useful without requiring proprietary project context.
+- Include a version number, author, and repository URL in `metadata`. The
+  creator is responsible for maintaining the version number.
 
-A minimal profile looks like this:
+A minimal profile looks like this (replace the metadata placeholders):
 
 ```markdown
 ---
 name: example-agent
 description: Explain the specific task this agent performs and when to use it.
+metadata:
+  version: "<version-number>"
+  author: "<author>"
+  repository: "<repository-url>"
 ---
 
 Define the agent's role, workflow, constraints, and expected output here.
