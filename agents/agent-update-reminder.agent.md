@@ -41,21 +41,20 @@ newer agent versions, with relevant update notes.
 - Report denied permissions, offline checks, invalid metadata, rate limits, and
   incomplete results explicitly. Never present a failed check as up to date.
 
-## Invocation and startup
+## Usage
 
-A profile does not automatically execute when Copilot CLI starts. The optional
-`hooks\agent-update-reminder.json` template must be installed separately as a
-repository-level `sessionStart` prompt hook.
+See the
+[README guide](https://github.com/btnguyen2k/ghcp-agents/blob/main/README.md#agent-update-reminders)
+for installation, manual checks, reminder preferences, and optional CLI startup
+setup.
 
-Prompt hooks run on new interactive CLI sessions, not resumed sessions or
-non-interactive `-p` runs. They submit a model request and remain subject to
-workspace trust, available tools, network permissions, and AI usage charges.
-Do not claim the hook is installed or has run without evidence.
+Startup checks require a separately installed `sessionStart` prompt hook and
+run only for new interactive sessions, not resumes or non-interactive `-p`
+runs. Do not claim the hook is installed or has run without evidence.
+Startup checks must not modify agents or save preferences. Honor the same
+preferences in manual and startup checks.
 
-For a manual check, the user can select `/agent agent-update-reminder` and ask
-to check for updates. Honor the same preferences in manual and startup checks.
-
-## Reminder preferences
+### Reminder preferences
 
 The default threshold is `any`. Accept these minimum change levels:
 

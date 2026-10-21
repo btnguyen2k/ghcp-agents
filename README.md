@@ -125,58 +125,25 @@ and
 [configuration reference](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
 for current client support and profile options.
 
-## Commit-message modes
+## Agent documentation
 
-The Angular-style commit message generator supports two header-type modes:
+See agent's documentation in the respective `.agent.md` files within the `agents/` directory.
 
-- **Normal (default):** Common Angular-style types plus canonical extensions
-  recognized by [action-semrelease](https://github.com/btnguyen2k/action-semrelease),
-  such as `breaking`, `deprecate`, `patch`, `improvement`, `optimize`, `security`,
-  and `deps`.
-- **Strict:** Only Angular's eight regular header types: `build`, `ci`, `docs`,
-  `feat`, `fix`, `perf`, `refactor`, and `test`. Types such as `chore`, `style`,
-  `revert`, and the normal-mode extensions are excluded.
+### Agent update reminders
 
-Choose a mode explicitly in your request, or pre-set a default in an
-instructions file your client loads:
+The reminder checks installed profiles from this collection, ignores unrelated
+agents, and never automatically replaces files. It compares per-agent versions
+against a pinned upstream `main` snapshot and summarizes relevant GitHub
+Releases, with `RELEASE-NOTES.md` as a fallback.
 
-```text
-For angular-style-commit-message-generator, use strict mode by default.
-```
+#### Manual checks
 
-An explicit mode in the current request overrides the configured default for
-that invocation only. Both modes keep `type(scope): short summary`, an optional
-scope, single-line output, and opt-in file writing. Strict mode changes the
-regular type list, not Angular-specific scopes or full body/footer rules.
+Copy
+[`agent-update-reminder.agent.md`](agents/agent-update-reminder.agent.md)
+into the destination repository's `.github\agents\` directory. Restart Copilot
+CLI, select `/agent agent-update-reminder`, then ask it to check for updates.
 
-In normal mode, release impact follows the action's type rules: major-impact
-types are reserved for actual compatibility breaks, `refactor` and `deprecate`
-are minor, and `security` and `deps` are patch. Types such as `docs` and `chore`
-do not themselves trigger a release. Words in the summary cannot change that
-classification; use a major-impact type rather than `fix` to request a breaking
-release. Strict single-line headers do not encode that extra release metadata.
-
-## Agent update reminders
-
-Install
-[`agents/agent-update-reminder.agent.md`](agents/agent-update-reminder.agent.md)
-in the destination repository's `.github\agents\` directory. Select
-`/agent agent-update-reminder`, then ask it to check for updates.
-
-The reminder inspects only installed profiles whose `metadata.repository`
-identifies `btnguyen2k/ghcp-agents`; unrelated agents are ignored. It compares
-each agent's own `metadata.version` with a pinned snapshot of upstream `main`
-through GitHub's API, not the repository's overall release number. Checks are
-version-based: different content with the same version is not an update.
-Installed profiles and local customizations are never automatically replaced.
-
-GitHub Releases are the preferred source for "what's new" because notes are
-associated with published tags. `RELEASE-NOTES.md` is the fallback. Notes are
-matched to the affected agents, and missing notes or unverified release status
-are disclosed rather than guessed. A newer version on `main` can trigger a
-reminder even before it appears in a published release.
-
-### Reminder thresholds
+#### Reminder thresholds
 
 | Threshold | Notifications |
 | --- | --- |
@@ -192,28 +159,24 @@ also save this sentence in an instructions file your client loads:
 For ghcp-agents update reminders, use threshold minor.
 ```
 
-An explicit threshold for the current check takes precedence over saved
-preferences; repository-specific preferences take precedence over user-wide
-preferences. Nothing is persisted without an explicit request.
+An explicit threshold for the current check overrides saved preferences;
+repository-specific preferences take precedence over user-wide preferences.
+Nothing is persisted without an explicit request.
 
-### Optional Copilot CLI startup checks
+#### Optional Copilot CLI startup checks
 
-Copy the
-[`hooks/agent-update-reminder.json`](hooks/agent-update-reminder.json)
-template to `.github\hooks\agent-update-reminder.json` in the destination
-repository after installing the agent. Preserve any existing hook configuration.
-The template is not enabled in this repository.
+After installing the agent, copy the
+[hook template](hooks/agent-update-reminder.json) to
+`.github\hooks\agent-update-reminder.json` in the destination repository.
+Preserve any existing hook configuration.
 
-The `sessionStart` prompt hook submits the check automatically on **new
-interactive sessions** in CLI versions that support prompt hooks. It does not
-run on resumed sessions or in non-interactive `-p` mode. An agent profile alone
-does not auto-start. Startup checks use AI credits like other model requests
-and remain subject to workspace trust, tool availability, and network approval.
+The opt-in `sessionStart` prompt hook runs only on new interactive sessions,
+not resumed sessions or non-interactive `-p` runs. An agent profile alone does
+not auto-start. Startup checks use AI credits like other model requests and
+remain subject to workspace trust, tool availability, and network approval.
 
-The checker reports incomplete or failed checks instead of claiming everything
-is up to date, and it does not modify agents or save preferences at startup.
-Remove the installed hook file to disable automatic checks; manual checks
-remain available.
+Startup checks do not modify agents or save preferences. Remove the installed
+hook file to disable automatic checks; manual checks remain available.
 
 See the official
 [Copilot hooks reference](https://docs.github.com/en/copilot/reference/hooks-configuration#prompt-hooks)
@@ -229,6 +192,8 @@ Agents contributed to this repository should:
 - State important boundaries, expected outputs, and validation steps.
 - Avoid secrets and assumptions that only apply to one private environment.
 - Be useful without requiring proprietary project context.
+- Keep specialized details with the agent profile; document shared setup and
+  generic workflows in this README.
 - Include a version number, author, and repository URL in `metadata`. The
   creator is responsible for maintaining the version number.
 
