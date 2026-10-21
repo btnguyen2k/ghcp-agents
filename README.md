@@ -26,6 +26,7 @@ workflow. A well-scoped agent can help:
 | Agent | Version | Description |
 | --- | --- | --- |
 | [Angular-style commit message generator](agents/angular-style-commit-message-generator.agent.md) | 0.1.1 | Generates concise, meaning-first Angular-style commit messages from selected or staged changes. Supports independent outcomes and opt-in file persistence. |
+| [Agent update reminder](agents/agent-update-reminder.agent.md) | 0.1.0 | Checks installed ghcp-agents profiles for newer versions and relevant update notes, with configurable reminder thresholds and optional CLI startup checks. |
 | [Generic code reviewer](agents/generic-code-reviewer.agent.md) | 0.1.1 | Reviews supplied changes or repository scopes for high-confidence correctness, regression, compatibility, reliability, and performance defects with coverage disclosure. |
 | [Generic security reviewer](agents/generic-security-reviewer.agent.md) | 0.1.0 | Audits supplied changes or repository scopes for high-confidence exploitable vulnerabilities with evidence, coverage disclosure, severity, and remediation guidance. |
 | [C# code reviewer](agents/csharp-code-reviewer.agent.md) | 0.1.1 | Reviews C# and .NET changes or repository scopes for high-confidence correctness, compatibility, reliability, and performance defects across ASP.NET Core, EF Core, Blazor, and runtime code. |
@@ -42,6 +43,10 @@ Example requests:
 - **`angular-style-commit-message-generator`:** Generate the commit messages
   and append them to
   `.semrelease/this_release`.
+- **`agent-update-reminder`:** Check installed ghcp-agents profiles for updates.
+- **`agent-update-reminder`:** Remind me only about minor or major updates.
+- **`agent-update-reminder`:** Save my reminder threshold as major in the
+  instructions file I specify.
 - **`generic-code-reviewer`:** Review the attached changes since the last
   commit for high-confidence code defects.
 - **`generic-code-reviewer`:** Audit the whole repository for high-confidence
@@ -103,6 +108,7 @@ To select an agent directly:
 
 ```text
 /agent angular-style-commit-message-generator
+/agent agent-update-reminder
 /agent generic-code-reviewer
 /agent generic-security-reviewer
 /agent csharp-code-reviewer
@@ -116,6 +122,69 @@ See GitHub's
 and
 [configuration reference](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
 for current client support and profile options.
+
+## Agent update reminders
+
+Install
+[`agents/agent-update-reminder.agent.md`](agents/agent-update-reminder.agent.md)
+in the destination repository's `.github\agents\` directory. Select
+`/agent agent-update-reminder`, then ask it to check for updates.
+
+The reminder inspects only installed profiles whose `metadata.repository`
+identifies `btnguyen2k/ghcp-agents`; unrelated agents are ignored. It compares
+each agent's own `metadata.version` with a pinned snapshot of upstream `main`
+through GitHub's API, not the repository's overall release number. Checks are
+version-based: different content with the same version is not an update.
+Installed profiles and local customizations are never automatically replaced.
+
+GitHub Releases are the preferred source for "what's new" because notes are
+associated with published tags. `RELEASE-NOTES.md` is the fallback. Notes are
+matched to the affected agents, and missing notes or unverified release status
+are disclosed rather than guessed. A newer version on `main` can trigger a
+reminder even before it appears in a published release.
+
+### Reminder thresholds
+
+| Threshold | Notifications |
+| --- | --- |
+| `any` (default) | Any newer semantic version, including patch updates and prerelease-to-stable promotions. |
+| `minor` | Minor or major increases. |
+| `major` | Major increases only. |
+
+Ask for a threshold for one check, or explicitly ask Copilot to remember it
+with repository or user scope when client memory support is available. You can
+also save this sentence in an instructions file your client loads:
+
+```text
+For ghcp-agents update reminders, use threshold minor.
+```
+
+An explicit threshold for the current check takes precedence over saved
+preferences; repository-specific preferences take precedence over user-wide
+preferences. Nothing is persisted without an explicit request.
+
+### Optional Copilot CLI startup checks
+
+Copy the
+[`hooks/agent-update-reminder.json`](hooks/agent-update-reminder.json)
+template to `.github\hooks\agent-update-reminder.json` in the destination
+repository after installing the agent. Preserve any existing hook configuration.
+The template is not enabled in this repository.
+
+The `sessionStart` prompt hook submits the check automatically on **new
+interactive sessions** in CLI versions that support prompt hooks. It does not
+run on resumed sessions or in non-interactive `-p` mode. An agent profile alone
+does not auto-start. Startup checks use AI credits like other model requests
+and remain subject to workspace trust, tool availability, and network approval.
+
+The checker reports incomplete or failed checks instead of claiming everything
+is up to date, and it does not modify agents or save preferences at startup.
+Remove the installed hook file to disable automatic checks; manual checks
+remain available.
+
+See the official
+[Copilot hooks reference](https://docs.github.com/en/copilot/reference/hooks-configuration#prompt-hooks)
+for startup-hook support and configuration.
 
 ## Agent conventions
 
