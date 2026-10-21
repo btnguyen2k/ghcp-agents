@@ -25,7 +25,7 @@ workflow. A well-scoped agent can help:
 
 | Agent | Version | Description |
 | --- | --- | --- |
-| [Angular-style commit message generator](agents/angular-style-commit-message-generator.agent.md) | 0.1.1 | Generates concise, meaning-first Angular-style commit messages with normal or strict type lists. Supports independent outcomes and opt-in file persistence. |
+| [Angular-style commit message generator](agents/angular-style-commit-message-generator.agent.md) | 0.2.0 | Generates concise, meaning-first Angular-style commit messages with normal or strict type lists. Supports independent outcomes and opt-in file persistence. |
 | [Agent update reminder](agents/agent-update-reminder.agent.md) | 0.1.0 | Checks installed ghcp-agents profiles for newer versions and relevant update notes, with configurable reminder thresholds and optional CLI startup checks. |
 | [Generic code reviewer](agents/generic-code-reviewer.agent.md) | 0.1.1 | Reviews supplied changes or repository scopes for high-confidence correctness, regression, compatibility, reliability, and performance defects with coverage disclosure. |
 | [Generic security reviewer](agents/generic-security-reviewer.agent.md) | 0.1.0 | Audits supplied changes or repository scopes for high-confidence exploitable vulnerabilities with evidence, coverage disclosure, severity, and remediation guidance. |

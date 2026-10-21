@@ -3,3 +3,5 @@
 #   git log origin..HEAD | grep "^\s" > .semrelease/this_release
 #!VERSION=0.4.0
 - feat(agents): add agent agent-update-reminder
+- feat(agents/angular-style-commit-message-generator): release 0.2.0 - add normal and strict modes
+- improvement(agents/angular-style-commit-message-generator): release 0.2.0 - distinguish bug fixes from patch adjustments

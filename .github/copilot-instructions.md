@@ -23,3 +23,23 @@ Treat `agents\angular-style-commit-message-generator.agent.md` as the source
 profile. Whenever it changes, update
 `.github\agents\angular-style-commit-message-generator.agent.md` in the same change.
 Keep both files identical, including all frontmatter, metadata, and instructions.
+
+## Repository commit messages
+
+These conventions apply to commits in this repository.
+
+For a brand-new agent, use:
+
+```text
+feat(agents): add agent <agent-name>
+```
+
+For a new version of an existing agent, use:
+
+```text
+type(agents/<agent-name>): release <version> - <short description>
+```
+
+Choose `type` to match the individual update. Keep its description short and
+concise. If the new version contains multiple updates, write one release-format
+commit message per update; do not combine them into a single message.
