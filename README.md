@@ -25,7 +25,7 @@ workflow. A well-scoped agent can help:
 
 | Agent | Version | Description |
 | --- | --- | --- |
-| [Angular-style commit message generator](agents/angular-style-commit-message-generator.agent.md) | 0.1.1 | Generates concise, meaning-first Angular-style commit messages from selected or staged changes. Supports independent outcomes and opt-in file persistence. |
+| [Angular-style commit message generator](agents/angular-style-commit-message-generator.agent.md) | 0.1.1 | Generates concise, meaning-first Angular-style commit messages with normal or strict type lists. Supports independent outcomes and opt-in file persistence. |
 | [Agent update reminder](agents/agent-update-reminder.agent.md) | 0.1.0 | Checks installed ghcp-agents profiles for newer versions and relevant update notes, with configurable reminder thresholds and optional CLI startup checks. |
 | [Generic code reviewer](agents/generic-code-reviewer.agent.md) | 0.1.1 | Reviews supplied changes or repository scopes for high-confidence correctness, regression, compatibility, reliability, and performance defects with coverage disclosure. |
 | [Generic security reviewer](agents/generic-security-reviewer.agent.md) | 0.1.0 | Audits supplied changes or repository scopes for high-confidence exploitable vulnerabilities with evidence, coverage disclosure, severity, and remediation guidance. |
@@ -38,6 +38,8 @@ Example requests:
 
 - **`angular-style-commit-message-generator`:** Generate a commit message for
   the staged changes.
+- **`angular-style-commit-message-generator`:** Generate a commit message in
+  strict mode for the staged changes.
 - **`angular-style-commit-message-generator`:** Generate separate commit
   messages for each independent change.
 - **`angular-style-commit-message-generator`:** Generate the commit messages
@@ -122,6 +124,37 @@ See GitHub's
 and
 [configuration reference](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
 for current client support and profile options.
+
+## Commit-message modes
+
+The Angular-style commit message generator supports two header-type modes:
+
+- **Normal (default):** Common Angular-style types plus canonical extensions
+  recognized by [action-semrelease](https://github.com/btnguyen2k/action-semrelease),
+  such as `breaking`, `deprecate`, `patch`, `improvement`, `optimize`, `security`,
+  and `deps`.
+- **Strict:** Only Angular's eight regular header types: `build`, `ci`, `docs`,
+  `feat`, `fix`, `perf`, `refactor`, and `test`. Types such as `chore`, `style`,
+  `revert`, and the normal-mode extensions are excluded.
+
+Choose a mode explicitly in your request, or pre-set a default in an
+instructions file your client loads:
+
+```text
+For angular-style-commit-message-generator, use strict mode by default.
+```
+
+An explicit mode in the current request overrides the configured default for
+that invocation only. Both modes keep `type(scope): short summary`, an optional
+scope, single-line output, and opt-in file writing. Strict mode changes the
+regular type list, not Angular-specific scopes or full body/footer rules.
+
+In normal mode, release impact follows the action's type rules: major-impact
+types are reserved for actual compatibility breaks, `refactor` and `deprecate`
+are minor, and `security` and `deps` are patch. Types such as `docs` and `chore`
+do not themselves trigger a release. Words in the summary cannot change that
+classification; use a major-impact type rather than `fix` to request a breaking
+release. Strict single-line headers do not encode that extra release metadata.
 
 ## Agent update reminders
 
