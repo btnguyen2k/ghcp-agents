@@ -25,14 +25,18 @@ workflow. A well-scoped agent can help:
 
 | Agent | Version | Description |
 | --- | --- | --- |
-| [Angular-style commit message generator](agents/angular-style-commit-message-generator.agent.md) | 0.2.0 | Generates concise, meaning-first Angular-style commit messages with normal or strict type lists. Supports independent outcomes and opt-in file persistence. |
 | [Agent update reminder](agents/agent-update-reminder.agent.md) | 0.1.0 | Checks installed ghcp-agents profiles for newer versions and relevant update notes, with configurable reminder thresholds and optional CLI startup checks. |
+| [Angular-style commit message generator](agents/angular-style-commit-message-generator.agent.md) | 0.2.0 | Generates concise, meaning-first Angular-style commit messages with normal or strict type lists. Supports independent outcomes and opt-in file persistence. |
 | [Generic code reviewer](agents/generic-code-reviewer.agent.md) | 0.1.1 | Reviews supplied changes or repository scopes for high-confidence correctness, regression, compatibility, reliability, and performance defects with coverage disclosure. |
 | [Generic security reviewer](agents/generic-security-reviewer.agent.md) | 0.1.0 | Audits supplied changes or repository scopes for high-confidence exploitable vulnerabilities with evidence, coverage disclosure, severity, and remediation guidance. |
 | [C# code reviewer](agents/csharp-code-reviewer.agent.md) | 0.1.1 | Reviews C# and .NET changes or repository scopes for high-confidence correctness, compatibility, reliability, and performance defects across ASP.NET Core, EF Core, Blazor, and runtime code. |
 | [C# security reviewer](agents/csharp-security-reviewer.agent.md) | 0.1.0 | Audits C# and .NET changes or repository scopes for high-confidence exploitable vulnerabilities across ASP.NET Core, EF Core, Blazor, and runtime boundaries. |
 | [Python code reviewer](agents/python-code-reviewer.agent.md) | 0.1.1 | Reviews Python changes or repository scopes for high-confidence correctness, compatibility, reliability, and performance defects across Django, Flask, FastAPI, SQLAlchemy, Pydantic, packaging, and runtime behavior. |
 | [Python security reviewer](agents/python-security-reviewer.agent.md) | 0.1.0 | Audits Python changes or repository scopes for high-confidence exploitable vulnerabilities across Django, Flask, FastAPI, SQLAlchemy, Pydantic, packaging, and runtime boundaries. |
+| [Go code reviewer](agents/go-code-reviewer.agent.md) | 0.1.0 | Reviews Go changes or repository scopes for high-confidence correctness, compatibility, reliability, and performance defects across concurrency, context cancellation, net/http, database/sql, modules, and runtime behavior. |
+| [Go security reviewer](agents/go-security-reviewer.agent.md) | 0.1.0 | Audits Go changes or repository scopes for high-confidence exploitable vulnerabilities across HTTP services, middleware, templates, filesystems, concurrency, and runtime boundaries. |
+| [JavaScript/TypeScript code reviewer](agents/javascript-typescript-code-reviewer.agent.md) | 0.1.0 | Reviews JavaScript and TypeScript changes or repository scopes for high-confidence correctness, compatibility, reliability, and performance defects across browser and server runtimes, async flows, modules, and frameworks. |
+| [JavaScript/TypeScript security reviewer](agents/javascript-typescript-security-reviewer.agent.md) | 0.1.0 | Audits JavaScript and TypeScript changes or repository scopes for high-confidence exploitable vulnerabilities across browser and server runtimes, frontend and backend frameworks, packages, and client/server trust boundaries. |
 
 Example requests:
 
@@ -65,11 +69,21 @@ Example requests:
   high-confidence framework, ORM, packaging, and runtime defects.
 - **`python-security-reviewer`:** Audit the attached Python changes for
   exploitable framework, ORM, packaging, and runtime vulnerabilities.
+- **`go-code-reviewer`:** Review the attached Go changes for high-confidence
+  concurrency, cancellation, lifecycle, and compatibility defects.
+- **`go-security-reviewer`:** Review the attached Go changes for exploitable
+  HTTP, authorization, filesystem, and concurrency vulnerabilities.
+- **`javascript-typescript-code-reviewer`:** Review the attached JavaScript
+  and TypeScript changes for high-confidence async, module, framework, and
+  runtime defects.
+- **`javascript-typescript-security-reviewer`:** Review the attached JavaScript
+  and TypeScript changes for exploitable browser, server, package, and
+  client/server boundary vulnerabilities.
 
 The reviewer agents intentionally expose only read and search tools. Use the
-C# reviewers for C# and .NET scopes, the Python reviewers for Python scopes,
-and the generic reviewers for other or mixed ecosystems. Supply the change
-context for change reviews. Whole-repository audits must be requested
+C#, Python, Go, and shared JavaScript/TypeScript reviewers for their respective
+ecosystems, and the generic reviewers for other or mixed ecosystems. Supply the
+change context for change reviews. Whole-repository audits must be requested
 explicitly and report their coverage limitations.
 
 See [ROADMAP.md](ROADMAP.md) for planned agent categories and future work.
@@ -117,6 +131,10 @@ To select an agent directly:
 /agent csharp-security-reviewer
 /agent python-code-reviewer
 /agent python-security-reviewer
+/agent go-code-reviewer
+/agent go-security-reviewer
+/agent javascript-typescript-code-reviewer
+/agent javascript-typescript-security-reviewer
 ```
 
 See GitHub's

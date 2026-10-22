@@ -5,3 +5,8 @@
 - feat(agents): add agent agent-update-reminder
 - feat(agents/angular-style-commit-message-generator): release 0.2.0 - add normal and strict modes
 - impr(agents/angular-style-commit-message-generator): release 0.2.0 - distinguish bug fixes from patch adjustments
+- feat(agents): add agent go-code-reviewer
+- feat(agents): add agent go-security-reviewer
+- feat(agents): add agent javascript-typescript-code-reviewer
+- feat(agents): add agent javascript-typescript-security-reviewer
+- docs(agents): move agents documentation to their respective files
