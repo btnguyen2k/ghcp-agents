@@ -1,0 +1,41 @@
+# Automatically merge PRs from dependabot
+
+name: 'Automerge-Dependabot'
+
+on:
+  workflow_run:
+    workflows: [ 'CI' ]
+    types: [ 'completed' ]
+
+permissions:
+  contents: read
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    if: |
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Merge PR
+        id: merge
+        uses: btnguyen2k/gh-actions/automerge-dependabot@977f144c5983c1c79dc3caaddd68d5e88976383a # automerge-dependabot/v0.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Report merge result
+        shell: bash
+        env:
+          MERGE_STATUS: ${{ steps.merge.outputs.status }}
+          MERGE_REASON: ${{ steps.merge.outputs.reason }}
+          PR_NUMBER: ${{ steps.merge.outputs.pr-number }}
+        run: |
+          if [ "$MERGE_STATUS" = "merged" ]; then
+            printf '✅ Merged PR #%s.\n' "$PR_NUMBER"
+          elif [ -n "$PR_NUMBER" ]; then
+            printf 'ℹ️ Skipped PR #%s: %s.\n' "$PR_NUMBER" "$MERGE_REASON"
+          else
+            printf 'ℹ️ Skipped: %s.\n' "$MERGE_REASON"
+          fi
