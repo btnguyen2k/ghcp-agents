@@ -1,5 +1,20 @@
 # GHCP-Agents release notes
 
+## 2026-10-28 - v0.4.0
+
+### Added/Refactoring/Deprecation
+
+- Feat(agents): add agent agent-update-reminder
+- Feat(agents): add agent go-code-reviewer
+- Feat(agents): add agent go-security-reviewer
+- Feat(agents): add agent javascript-typescript-code-reviewer
+- Feat(agents): add agent javascript-typescript-security-reviewer
+- Feat(agents/angular-style-commit-message-generator): release 0.2.0 - add normal and strict modes
+
+### Fixed/Improvements
+
+- Impr(agents/angular-style-commit-message-generator): release 0.2.0 - distinguish bug fixes from patch adjustments
+
 ## 2026-10-07 - v0.3.1
 
 ### Fixed/Improvements
