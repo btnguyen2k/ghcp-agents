@@ -7,161 +7,236 @@ on:
     types: [ closed ]
     branches: [ release ]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: release-publication
+  cancel-in-progress: false
+
 env:
   BRANCH_TO_RELEASE: 'release'
   TAG_PREFIX: 'v'
   FILE_CHANGELOG: 'RELEASE-NOTES.md'
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
+  CaptureContext:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    outputs:
+      TARGET_SHA: ${{ steps.context.outputs.target-sha }}
+    steps:
+      - name: Capture workflow context
+        id: context
+        uses: btnguyen2k/gh-actions/workflow-context@402d4293c057c8931fbb804c3cc18a5d0047fb95 # workflow-context/v0.1.0
+
   CallCI:
+    needs: [ CaptureContext ]
     permissions:
       contents: read
       actions: write
     uses: ./.github/workflows/ci.yaml
+    with:
+      target-sha: ${{ needs.CaptureContext.outputs.TARGET_SHA }}
     secrets: inherit
 
   ReleaseDryRun:
     runs-on: ubuntu-latest
-    needs: [ CallCI ]
-    if: |
-      github.event.pull_request.merged == true
+    needs: [ CaptureContext, CallCI ]
     outputs:
       RESULT: ${{ steps.release_dry_run.outputs.result }}
       VERSION: ${{ steps.release_dry_run.outputs.releaseVersion }}
       RELEASE_NOTES: ${{ steps.release_dry_run.outputs.releaseNotes }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.CaptureContext.outputs.TARGET_SHA }}
       - name: Install Node
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 'lts/*'
       - name: Release (dry-run)
         # see https://github.com/btnguyen2k/action-semrelease for documentation
         id: release_dry_run
-        uses: btnguyen2k/action-semrelease@v5
+        uses: btnguyen2k/action-semrelease@37fe196d36496098bd291e9519c86772ea2e0c0d # v5.1.0
         with:
           dry-run: true
-          auto-mode: true
           github-token: ${{ github.token }}
-          tag-major-release: false
-          tag-minor-release: false
+          target-sha: ${{ needs.CaptureContext.outputs.TARGET_SHA }}
           branches: ${{ env.BRANCH_TO_RELEASE }}
           tag-prefix: ${{ env.TAG_PREFIX }}
-          tag-only: true
 
   Release:
     runs-on: ubuntu-latest
-    if: |
-      github.event.pull_request.merged == true
-    needs: [ ReleaseDryRun ]
+    if: needs.ReleaseDryRun.outputs.RESULT == 'SUCCESS'
+    needs: [ CaptureContext, ReleaseDryRun ]
     permissions:
       contents: write # to be able to publish a GitHub release
     outputs:
-      RESULT: ${{ needs.ReleaseDryRun.outputs.RESULT }}
-      VERSION: ${{ needs.ReleaseDryRun.outputs.VERSION }}
-      RELEASE_NOTES: ${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}
+      RESULT: ${{ steps.publish.outputs.result }}
+      VERSION: ${{ steps.publish.outputs.releaseVersion }}
+      RELEASE_NOTES: ${{ steps.publish.outputs.releaseNotes }}
+      RELEASE_SHA: ${{ steps.prepare.outputs.sha }}
     steps:
-      - uses: actions/checkout@v7
-      - name: Update module meta
-        run: |
-          RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
-          VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
-          RELEASE_NOTES='${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}'
-
-          echo "🕘 Updating module meta..."
-          echo "   - RESULT: ${RESULT}"
-          echo "   - VERSION: ${VERSION}"
-          echo "   - RELEASE_NOTES: ${RELEASE_NOTES}"
-
-          if [ "${RESULT}" == "SUCCESS" ]; then
-            DATE=`date +%Y-%m-%d`
-            head -1 ${FILE_CHANGELOG} > .temp.md
-            echo -e "\n## ${DATE} - v${VERSION}\n\n${RELEASE_NOTES}" >> .temp.md
-            tail -n +2 ${FILE_CHANGELOG} >> .temp.md
-            mv -f .temp.md ${FILE_CHANGELOG}
-            echo ========== content of ${FILE_CHANGELOG} ==========
-            cat ${FILE_CHANGELOG}
-
-            echo ========== update .md files ==========
-            sed -i -E "s/<<VERSION>>/v${VERSION}/" ./*.md
-
-            echo ========== commit updates ==========
-            git config --global user.email "<>"
-            git config --global user.name "CI Build"
-            git commit -am "Update ${FILE_CHANGELOG}, *.md files and version info in app/version.py for new version ${VERSION}"
-            git push origin ${BRANCH_TO_RELEASE}
-
-            echo ========== tag ==========
-            git tag -f -a "${TAG_PREFIX}${VERSION}" -m "Release ${TAG_PREFIX}/v${VERSION}"
-            git push origin "${TAG_PREFIX}${VERSION}" -f
-            echo "✅ Done."
-          else
-            echo "❎ SKIPPED."
-          fi
-      - name: Create release
-        uses: actions/github-script@v9
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.CaptureContext.outputs.TARGET_SHA }}
+      - name: Prepare release documentation
+        id: prepare
         env:
-          RESULT: ${{ needs.ReleaseDryRun.outputs.RESULT }}
+          SOURCE_SHA: ${{ needs.CaptureContext.outputs.TARGET_SHA }}
           VERSION: ${{ needs.ReleaseDryRun.outputs.VERSION }}
           RELEASE_NOTES: ${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}
-        with:
-            script: |
-              if (process.env['RESULT'] != 'SUCCESS') {
-                console.log('❎ SKIPPED.');
-                return;
-              }
-              const {data: release} = await github.rest.repos.createRelease({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                tag_name: process.env['TAG_PREFIX'] + process.env['VERSION'],
-                name: process.env['TAG_PREFIX'] + process.env['VERSION'],
-                body: process.env['RELEASE_NOTES'],
-                draft: false,
-                prerelease: false,
-              });
-              console.log('✅ Created release: ', release);
-      - name: Cleanup file .semrelease/this_release
         run: |
-          RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
-          if [ "${RESULT}" = "SUCCESS" ] && [ -f .semrelease/this_release ]; then
-            VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
-            echo "🕘 Cleaning up file .semrelease/this_release..."
-            echo "# This file has been cleaned up post-releasing version ${VERSION}." > .semrelease/this_release
-            echo "# Generate its content quickly using the following command:" >> .semrelease/this_release
-            echo "#   git log origin..HEAD | grep \"^\s\" > .semrelease/this_release" >> .semrelease/this_release
-            git config --global user.email "<>"
-            git config --global user.name "CI Build"
-            git commit -am "Cleanup file .semrelease/this_release post-releasing version ${VERSION}"
-            git push -f
-            echo "✅ Done."
-          else
-            echo "❎ SKIPPED."
+          REMOTE_SHA=$(git ls-remote --exit-code origin "refs/heads/${BRANCH_TO_RELEASE}" | cut -f1)
+          if [[ "$REMOTE_SHA" != "$SOURCE_SHA" ]]; then
+            echo "❌ Release branch changed; inspect the pinned source before retrying"
+            exit 1
           fi
+
+          if awk -v tag="${TAG_PREFIX}${VERSION}" \
+            '{ sub(/\r$/, "") } $1 == "##" && $NF == tag { found = 1 } END { exit !found }' "$FILE_CHANGELOG"; then
+            echo "❌ Release notes already contain this version; inspect the previous preparation"
+            exit 1
+          fi
+
+          temp_file=$(mktemp)
+          trap 'rm -f -- "$temp_file"' EXIT
+          {
+            head -n 1 -- "$FILE_CHANGELOG"
+            printf '\n## %s - %s%s\n\n%s\n' "$(date +%F)" "$TAG_PREFIX" "$VERSION" "$RELEASE_NOTES"
+            tail -n +2 -- "$FILE_CHANGELOG"
+          } > "$temp_file"
+          mv -- "$temp_file" "$FILE_CHANGELOG"
+          sed -i "s/<<VERSION>>/${TAG_PREFIX}${VERSION}/g" -- ./*.md
+
+          git add -- "$FILE_CHANGELOG" ./*.md
+          if git diff --cached --quiet; then
+            echo "❌ Release documentation did not change; inspect before retrying"
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs(release): prepare ${TAG_PREFIX}${VERSION}"
+          git push origin "HEAD:refs/heads/${BRANCH_TO_RELEASE}"
+          printf 'sha=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "✅ Release documentation prepared"
+      - name: Verify release target
+        id: verify
+        uses: btnguyen2k/action-semrelease@37fe196d36496098bd291e9519c86772ea2e0c0d # v5.1.0
+        with:
+          github-token: ${{ github.token }}
+          target-sha: ${{ steps.prepare.outputs.sha }}
+          branches: ${{ env.BRANCH_TO_RELEASE }}
+          tag-prefix: ${{ env.TAG_PREFIX }}
+          dry-run: true
+      - name: Check publication plan
+        env:
+          EXPECTED_VERSION: ${{ needs.ReleaseDryRun.outputs.VERSION }}
+          EXPECTED_NOTES: ${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}
+          ACTUAL_RESULT: ${{ steps.verify.outputs.result }}
+          ACTUAL_VERSION: ${{ steps.verify.outputs.releaseVersion }}
+          ACTUAL_NOTES: ${{ steps.verify.outputs.releaseNotes }}
+          RELEASE_SHA: ${{ steps.prepare.outputs.sha }}
+        run: |
+          if [[ "$ACTUAL_RESULT" != SUCCESS || "$ACTUAL_VERSION" != "$EXPECTED_VERSION" || "$ACTUAL_NOTES" != "$EXPECTED_NOTES" ]]; then
+            echo "❌ Release target no longer matches the original plan; inspect before retrying"
+            exit 1
+          fi
+          REMOTE_SHA=$(git ls-remote --exit-code origin "refs/heads/${BRANCH_TO_RELEASE}" | cut -f1)
+          if [[ "$REMOTE_SHA" != "$RELEASE_SHA" ]]; then
+            echo "❌ Release branch changed after preparation; inspect before retrying"
+            exit 1
+          fi
+          echo "✅ Release target matches the original plan"
+      - name: Publish release
+        id: publish
+        uses: btnguyen2k/action-semrelease@37fe196d36496098bd291e9519c86772ea2e0c0d # v5.1.0
+        with:
+          github-token: ${{ github.token }}
+          target-sha: ${{ steps.prepare.outputs.sha }}
+          version: ${{ needs.ReleaseDryRun.outputs.VERSION }}
+          branches: ${{ env.BRANCH_TO_RELEASE }}
+          tag-prefix: ${{ env.TAG_PREFIX }}
+          dry-run: false
+      - name: Cleanup file .semrelease/this_release
+        if: steps.publish.outputs.result == 'SUCCESS'
+        continue-on-error: true
+        env:
+          VERSION: ${{ steps.publish.outputs.releaseVersion }}
+          RELEASE_SHA: ${{ steps.prepare.outputs.sha }}
+        run: |
+          if [[ ! -f .semrelease/this_release ]]; then
+            echo "ℹ️ No release metadata to clean"
+            exit 0
+          fi
+          REMOTE_SHA=$(git ls-remote --exit-code origin "refs/heads/${BRANCH_TO_RELEASE}" | cut -f1)
+          if [[ "$REMOTE_SHA" != "$RELEASE_SHA" ]]; then
+            echo "⚠️ Release was published, but the branch changed; finish metadata cleanup separately"
+            exit 0
+          fi
+
+          {
+            printf '# This file has been cleaned up post-releasing version %s.\n' "$VERSION"
+            printf '%s\n' '# Generate its content quickly using the following command:' \
+              '#   git log origin..HEAD | grep "^\s" > .semrelease/this_release'
+          } > .semrelease/this_release
+          git add -- .semrelease/this_release
+          if git diff --cached --quiet -- .semrelease/this_release; then
+            echo "ℹ️ Release metadata is already clean"
+            exit 0
+          fi
+          git commit -m "chore(release): clear metadata after ${TAG_PREFIX}${VERSION}" -- .semrelease/this_release
+          if ! git push origin "HEAD:refs/heads/${BRANCH_TO_RELEASE}"; then
+            echo "⚠️ Release was published; finish metadata cleanup separately"
+            exit 1
+          fi
+          echo "✅ .semrelease/this_release cleaned up"
 
   MergeToMain:
     runs-on: ubuntu-latest
     needs: [ Release ]
+    if: needs.Release.outputs.RESULT == 'SUCCESS'
     permissions:
       pull-requests: write # to be able to create PRs or comment on released PRs
     steps:
-      - uses: actions/github-script@v9
+      - name: Create or update merge PR
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
-          RESULT: ${{ needs.Release.outputs.RESULT }}
+          VERSION: ${{ needs.Release.outputs.VERSION }}
           RELEASE_NOTES: ${{ needs.Release.outputs.RELEASE_NOTES }}
         with:
           script: |
-            if (process.env['RESULT'] != 'SUCCESS') {
-              console.log('❎ SKIPPED.');
+            const changes = {
+              title: `Merge to main after releasing new version ${process.env.VERSION}`,
+              body: process.env.RELEASE_NOTES,
+            };
+            const {data: existing} = await github.rest.pulls.list({
+              ...context.repo,
+              head: `${context.repo.owner}:${process.env.BRANCH_TO_RELEASE}`,
+              base: 'main',
+              state: 'open',
+              per_page: 1,
+            });
+            if (existing.length > 0) {
+              const {data: pr} = await github.rest.pulls.update({
+                ...context.repo,
+                pull_number: existing[0].number,
+                ...changes,
+              });
+              console.log('ℹ️ Updated existing PR:', pr.html_url);
               return;
             }
             const {data: pr} = await github.rest.pulls.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: "Merge to main after releasing new version ${{ needs.Release.outputs.VERSION }}",
-              body: process['env']['RELEASE_NOTES'],
-              head: process['env']['BRANCH_TO_RELEASE'],
+              ...context.repo,
+              ...changes,
+              head: process.env.BRANCH_TO_RELEASE,
               base: 'main',
               maintainer_can_modify: true,
             });
-            console.log('✅ Created PR: ', pr);
+            console.log('✅ Created PR:', pr.html_url);
