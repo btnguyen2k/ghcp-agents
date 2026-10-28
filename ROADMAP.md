@@ -9,6 +9,10 @@
 - [C# security reviewer](agents/csharp-security-reviewer.agent.md)
 - [Python code reviewer](agents/python-code-reviewer.agent.md)
 - [Python security reviewer](agents/python-security-reviewer.agent.md)
+- [Go code reviewer](agents/go-code-reviewer.agent.md)
+- [Go security reviewer](agents/go-security-reviewer.agent.md)
+- [JavaScript/TypeScript code reviewer](agents/javascript-typescript-code-reviewer.agent.md)
+- [JavaScript/TypeScript security reviewer](agents/javascript-typescript-security-reviewer.agent.md)
 
 ## Future agent categories
 

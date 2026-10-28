@@ -1,5 +1,8 @@
 name: 'CI'
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ '*' ]
@@ -9,6 +12,11 @@ on:
     types: [ opened, edited, reopened, synchronize, review_requested ]
     branches: [ '*' ]
   workflow_call:
+    inputs:
+      target-sha:
+        description: 'Commit SHA to check out and analyze.'
+        required: false
+        type: string
 
   # Allow manually trigger
   workflow_dispatch:
@@ -21,6 +29,10 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.target-sha || github.sha }}
       - name: Build project
         run: |
           echo "Building project..."
@@ -29,6 +41,10 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.target-sha || github.sha }}
       - name: Lint code
         run: |
           echo "Linting code..."
@@ -38,6 +54,10 @@ jobs:
     needs: [Build]
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.target-sha || github.sha }}
       - name: Run tests
         run: |
           echo "Running tests..."
@@ -52,21 +72,20 @@ jobs:
       RELEASE_NOTES: ${{ steps.release_dry_run.outputs.releaseNotes }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.target-sha || github.sha }}
       - name: Install Node
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 'lts/*'
       - name: Release (dry-run)
         # see https://github.com/btnguyen2k/action-semrelease for documentation
         id: release_dry_run
-        uses: btnguyen2k/action-semrelease@v5
+        uses: btnguyen2k/action-semrelease@37fe196d36496098bd291e9519c86772ea2e0c0d # v5.1.0
         with:
           dry-run: true
-          auto-mode: true
           github-token: ${{ github.token }}
-          tag-major-release: false
-          tag-minor-release: false
+          target-sha: ${{ inputs.target-sha || github.sha }}
           branches: ${{ github.ref_name }}
           tag-prefix: ${{ env.TAG_PREFIX }}
-          tag-only: true
